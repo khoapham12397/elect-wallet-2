@@ -116,7 +116,6 @@ public class TransferService {
 		}
 		senderWallet.setBalance(amountSender-amount);
 		receiverWallet.setBalance(receiverWallet.getBalance()+ amount);
-		// hay do nha ? // dung vya :
 		
 
 		Long timestamp =  System.currentTimeMillis();

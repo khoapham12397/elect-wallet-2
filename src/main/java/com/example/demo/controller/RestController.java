@@ -97,11 +97,7 @@ public class RestController {
 		return userService.getUserProfile(userId);
 	}
 	
-	@PostMapping(value ="/postEx", produces= {MediaType.APPLICATION_JSON_VALUE})
-	public UserProfileResponse changeProfile(@RequestBody ChangeProfileRequest rqBody){
-		
-		return null;
-	}
+	
 	@PostMapping(value="/topupDirect", produces = {MediaType.APPLICATION_JSON_VALUE})
 	public TopupResponse topupDirect(@RequestBody TopupDirectRequest rq){
 		Long txId= transferService.topupDirect(rq);
@@ -220,6 +216,7 @@ public class RestController {
 		}
 		return res;
 	}
+	@PostMapping(value="/registerWallet", produces= {MediaType.APPLICATION_JSON_VALUE})
 	public ActionResponse registerWallet(RegisterWalletRequest rq) {
 		ActionResponse res = new ActionResponse();
 		userService.registerWallet(rq);
@@ -227,6 +224,8 @@ public class RestController {
 		return res;
 		
 	}
+	
+	@PostMapping(value="/registerUser", produces= {MediaType.APPLICATION_JSON_VALUE})
 	public ActionResponse registerUser(RegisterUserRequest rq) {
 		ActionResponse res = new ActionResponse();
 		userService.registerUser(rq);
