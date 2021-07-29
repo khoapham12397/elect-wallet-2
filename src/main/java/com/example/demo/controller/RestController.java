@@ -202,7 +202,7 @@ public class RestController {
 	}
 	
 	@PostMapping(value="/changePassword", produces= {MediaType.APPLICATION_JSON_VALUE})
-	public ChangePassResponse changePassword(ChangePasswordRequest rq) {
+	public ChangePassResponse changePassword(@RequestBody ChangePasswordRequest rq) {
 		
 		ChangePassResponse res = new ChangePassResponse();
 		String x = userService.changePassword(rq);
@@ -217,7 +217,7 @@ public class RestController {
 		return res;
 	}
 	@PostMapping(value="/registerWallet", produces= {MediaType.APPLICATION_JSON_VALUE})
-	public ActionResponse registerWallet(RegisterWalletRequest rq) {
+	public ActionResponse registerWallet(@RequestBody RegisterWalletRequest rq) {
 		ActionResponse res = new ActionResponse();
 		userService.registerWallet(rq);
 		res.setCode(true); res.setMessage("Register Wallet Successful");
@@ -226,15 +226,17 @@ public class RestController {
 	}
 	
 	@PostMapping(value="/registerUser", produces= {MediaType.APPLICATION_JSON_VALUE})
-	public ActionResponse registerUser(RegisterUserRequest rq) {
+	public ActionResponse registerUser(@RequestBody RegisterUserRequest rq) {
 		ActionResponse res = new ActionResponse();
+		System.out.println(rq.getUserId());
+	
 		userService.registerUser(rq);
 		res.setCode(true); res.setMessage("Register Wallet Successful");
 		return res;
 		
 	}
 	@PostMapping(value="/changePin", produces= {MediaType.APPLICATION_JSON_VALUE})
-	public ActionResponse changePin(ChangePinRequest rq) {
+	public ActionResponse changePin(@RequestBody ChangePinRequest rq) {
 		
 		ActionResponse res = new ActionResponse();
 		if(userService.changePin(rq)) {

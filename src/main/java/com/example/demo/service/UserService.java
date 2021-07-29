@@ -3,6 +3,7 @@ package com.example.demo.service;
 import java.sql.Date;
 
 import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
 import javax.persistence.PersistenceContext;
 
 import org.mindrot.jbcrypt.BCrypt;
@@ -78,24 +79,29 @@ public class UserService {
 		userRepository.save(profile);
 	}
 	
+	@Transactional(propagation = Propagation.REQUIRED)
 	public void registerWallet(RegisterWalletRequest rq) {
+		
+		UserProfile profile = entityManager.find(UserProfile.class, rq.getUserId(),LockModeType.PESSIMISTIC_WRITE);
+		profile.setIdentityNumber(rq.getIdentity());
+		profile.setPhone(rq.getPhone());
 		Wallet wallet = new Wallet();
 		wallet.setWalletId(rq.getUserId()); wallet.setBalance(0L);
 		wallet.setHashedPin(rq.getHashedPin());
 		walletRepository.save(wallet);
 	}
 	
-	@Transactional()
+	
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void registerUser(RegisterUserRequest rq) {
 		
+		System.out.println("register user id : "+ rq.getUserId()+ " and username: "+ rq.getUsername()
+		+", fullname : "+ rq.getFullname() +", password:" + rq.getPassword());
+		
 		UserProfile profile= new UserProfile();
-		profile.setAddress(rq.getAddress());
+		
 		profile.setFullName(rq.getFullname());
-		profile.setGender(rq.getGender());
-		profile.setPhone(rq.getPhone());
-		profile.setIdentityNumber(rq.getIdentity());
 		profile.setUserId(rq.getUserId());
-		profile.setDateOfBirth(null);
 		
 		Authenticate authen = new Authenticate();
 		authen.setUserId(rq.getUserId());

@@ -23,7 +23,16 @@ public class UserProfile {
 	@Column(name="address")
 	private String address;
 	
+	public String getEmail() {
+		return email;
+	}
 
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	@Column(name="email")
+	private String email;
 	
 	public String getUserId() {
 		return userId;
