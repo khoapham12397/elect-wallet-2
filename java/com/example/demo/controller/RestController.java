@@ -24,6 +24,8 @@ import com.example.demo.model.ChangePasswordRequest;
 import com.example.demo.model.ChangePinRequest;
 import com.example.demo.model.ChangeProfileRequest;
 import com.example.demo.model.CreatePresentResponse;
+import com.example.demo.model.GetBalanceRequest;
+import com.example.demo.model.GetBalanceResponse;
 import com.example.demo.model.GetP2PsRequest;
 import com.example.demo.model.GetPresentRequest;
 import com.example.demo.model.GetPresentResponse;
@@ -190,7 +192,20 @@ public class RestController {
 		}
 		return res;
 	}
-	
+
+	@PostMapping(value="/getBalance", produces= {MediaType.APPLICATION_JSON_VALUE})
+	public GetBalanceResponse getPBalance(@RequestBody GetBalanceRequest rq){
+		GetBalanceResponse res= new GetBalanceResponse();
+		try {
+		Long bal = userService.getBalance(rq.getUserId());
+		
+			res.setBalance(bal);
+			res.setCode(true); res.setMessage("Successful");
+		}catch(RuntimeException exp) {
+			res.setCode(false); res.setMessage(exp.getMessage());
+		}
+		return res;
+	}
 	@PostMapping(value="/removePresent", produces= {MediaType.APPLICATION_JSON_VALUE})
 	public ActionResponse returnPresent(@RequestBody RemovePresentRequest rq){
 		

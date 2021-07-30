@@ -112,5 +112,11 @@ public class UserService {
 		authenRepository.save(authen);
 		
 	}
+	@Transactional()
+	public Long getBalance(String userId) {
+		Wallet  wallet = entityManager.find(Wallet.class, userId);
+		if(wallet == null) throw new RuntimeException("wallet is not exist");
+		return wallet.getBalance();
+	}
 }
 
