@@ -125,6 +125,7 @@ public class RestController {
 	@PostMapping(value="/topup", produces = {MediaType.APPLICATION_JSON_VALUE})
 	public TopupResponse topup(@RequestBody TopupRequest rq){
 		//System.out.println(rq.getWalletId()+" topup "+ rq.getAmount()+" , mess: "+ rq.getMessage());
+		Long amount = rq.getAmount();
 		Long txId= transferService.topup(rq);
 		TopupResponse res = new TopupResponse();
 		if(txId == 0L) {
@@ -135,6 +136,7 @@ public class RestController {
 			res.setMessage("Transaction Successful");
 			res.setTimestamp(System.currentTimeMillis());
 			res.setTransactionId(txId);
+			res.setAmount(amount);
 		}
 		return res;
 	}
