@@ -152,6 +152,7 @@ public class RestController {
 			res.setMessage("Transaction Successful");
 			res.setTimestamp(System.currentTimeMillis());
 			res.setTransactionId(txId);
+			res.setAmount(rq.getAmount());
 		} catch (SQLException e) {
 			res.setMessage("Transaction failed");
 			res.setTimestamp(System.currentTimeMillis());

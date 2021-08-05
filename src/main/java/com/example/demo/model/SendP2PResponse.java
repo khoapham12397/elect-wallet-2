@@ -12,6 +12,7 @@ public class SendP2PResponse {
 	private String message;
 	private Long transactionId;
 	private Long timestamp;
+	private Long amount;
 	
 	public String getMessage() {
 		return message;
@@ -31,5 +32,6 @@ public class SendP2PResponse {
 	public void setTimestamp(Long timestamp) {
 		this.timestamp = timestamp;
 	}
-	
+	public Long getAmount(){return amount;}
+	public void setAmount(Long amount){this.amount=amount;}
 }
