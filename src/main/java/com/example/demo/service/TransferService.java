@@ -1,24 +1,22 @@
 package com.example.demo.service;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.PersistenceContext;
 
+import com.example.demo.entity.*;
+import com.example.demo.repository.PresentTransactionRepository;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.demo.entity.Authenticate;
-import com.example.demo.entity.P2PTransaction;
-import com.example.demo.entity.Present;
-import com.example.demo.entity.TopupTransaction;
-import com.example.demo.entity.UserProfile;
-import com.example.demo.entity.Wallet;
 import com.example.demo.model.GetP2PsRequest;
 import com.example.demo.model.GetPresentRequest;
 import com.example.demo.model.GetTopupsRequest;
@@ -39,6 +37,9 @@ public class TransferService {
 	
 	@Autowired
 	PresentRepository presentRepository;
+
+	@Autowired
+	PresentTransactionRepository presentTransactionRepository;
 
 	@Transactional(propagation= Propagation.REQUIRED)
 	public void addBalance(String userId, Long amount) {
@@ -84,13 +85,8 @@ public class TransferService {
 		if(!pin.equals(wallet.getHashedPin())) return 0L;
 		
 		Long amount  = request.getAmount();
-		
-		
-		
 		wallet.setBalance(wallet.getBalance()+ amount);
 
-		
-		
 		TopupTransaction tsx =new TopupTransaction();
 		tsx.setAmount(amount);
 		tsx.setTimestamp(System.currentTimeMillis());
@@ -152,19 +148,12 @@ public class TransferService {
 		Long amount = rq.getAmount();
 		if(wallet.getBalance() < amount) return false;
 		wallet.setBalance(wallet.getBalance() - amount);
-		//String presentId, String ownerId, Long totalAmount, Long currentAmount, Long startTime,
-		//String sessionId, Boolean expire
 		Present pr = new Present(rq.getPresentId(),rq.getUserId(),rq.getAmount(),rq.getAmount(),System.currentTimeMillis(),
-				rq.getSessionId(), false);
-		
-		
+				rq.getSessionId(), false, rq.getEnvelope(), rq.getType());
 		presentRepository.save(pr);
-	
-		
 		return true;
 	}
-	
-	
+
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public Long getPresent(GetPresentRequest rq) {
 		String presentId = rq.getPresentId();
@@ -172,30 +161,35 @@ public class TransferService {
 		Present pr = entityManager.find(Present.class, presentId,LockModeType.PESSIMISTIC_WRITE);
 		if(pr==null) return -1L;
 		if(pr.getExpired()) return 0L;
-		Long startTime = pr.getstartTime();
-		
-		if(System.currentTimeMillis()- startTime>=24*60*60*1000) {
-			pr.setExpired(true);
-			presentRepository.delete(pr);
-			return -1L;
-		}
-		Long cur = pr.getCurrentAmount(),am = 0L;
-		Long y= cur/10000;
-		if(y==0) am=cur;
-		else {
+		if(pr.getEnvelope()==0) return -2L;
+		Boolean type = pr.getType();
+		Long am = pr.getTotalAmount()/pr.getEnvelope();
+
+		if (!type){
 			Random rd = new Random();
-			am = (Math.abs(rd.nextLong())% (Math.min(y+1,10L)))*10000;
-			if(am==0) am = 10000L; 
+			am = am - 100;
+			am = 100 + rd.nextLong() % am*2;
+			if (am > pr.getCurrentAmount())
+				am = pr.getCurrentAmount();
 		}
-		
-		Long remind = cur - am;
-		if(remind==0) pr.setExpired(true);
-		else pr.setCurrentAmount(remind);
+
+		pr.setCurrentAmount(pr.getCurrentAmount()-am);
+		pr.setCurrentEnvelope(pr.getCurrentEnvelope()-1);
 		Wallet wallet = entityManager.find(Wallet.class,rq.getUserId(), LockModeType.PESSIMISTIC_WRITE);
 		wallet.setBalance(wallet.getBalance() + am);
+		PresentTransaction pt = new PresentTransaction(UUID.randomUUID().toString(), rq.getUserId(), rq.getPresentId(), am, System.currentTimeMillis());
+		presentTransactionRepository.save(pt);
 		return am;
 	}
-	
+
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void checkExprired() {
+		List<Present> presents = presentRepository.findExpiredPresent(System.currentTimeMillis()-24*60*60*1000);
+		for (Present present:presents){
+			present.setExpired(true);
+			System.out.println("Expired present: " + present.getPresentId());
+		}
+	}
 	
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void removePresent(String presentId) {

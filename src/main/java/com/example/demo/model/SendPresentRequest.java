@@ -5,7 +5,9 @@ public class SendPresentRequest {
 	private Long amount;
 	private String sessionId;
 	private String presentId;
-	
+	private Long envelope;
+	private Boolean type;
+
 	public String getPresentId() {
 		return presentId;
 	}
@@ -30,5 +32,10 @@ public class SendPresentRequest {
 	public void setAmount(Long amount) {
 		this.amount = amount;
 	}
-	
+
+	public Long getEnvelope(){return envelope;}
+	public void setEnvelope(Long envelope){this.envelope=envelope;}
+
+	public Boolean getType(){return type;}
+	public void setType(Boolean type){this.type=type;}
 }

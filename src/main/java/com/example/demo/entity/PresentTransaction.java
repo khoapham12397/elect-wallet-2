@@ -15,7 +15,16 @@ public class PresentTransaction {
 	
 	@Column(name="receiver_wallet_id")
 	private String receiverWalletId;
-	
+
+	@Column(name="present_id")
+	private String presentId;
+
+	@Column(name="amount")
+	private Long amount;
+
+	@Column(name="timestamp")
+	private Long timestamp;
+
 	public PresentTransaction(String id, String receiverWalletId, String presentId, Long amount, Long timestamp) {
 		super();
 		this.id = id;
@@ -67,12 +76,5 @@ public class PresentTransaction {
 		this.timestamp = timestamp;
 	}
 
-	@Column(name="present_id")
-	private String presentId;
-	
-	@Column(name="amount")
-	private Long amount;
-	
-	@Column(name="timestamp")
-	private Long timestamp;
+
 }

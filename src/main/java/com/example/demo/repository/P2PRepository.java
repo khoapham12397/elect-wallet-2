@@ -25,7 +25,5 @@ public interface P2PRepository extends JpaRepository<P2PTransaction, Long>{
 	
 	@Query("select p from P2PTransaction p where p.senderId= :userId or p.receiverId= :userId")
 	public List<P2PTransaction> findByUser(String userId);
-	
-	
-	
+
 }
