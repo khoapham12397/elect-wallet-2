@@ -6,7 +6,7 @@ public class SendPresentRequest {
 	private String sessionId;
 	private String presentId;
 	private Long envelope;
-	private Boolean type;
+	private Boolean equal;
 
 	public String getPresentId() {
 		return presentId;
@@ -36,6 +36,6 @@ public class SendPresentRequest {
 	public Long getEnvelope(){return envelope;}
 	public void setEnvelope(Long envelope){this.envelope=envelope;}
 
-	public Boolean getType(){return type;}
-	public void setType(Boolean type){this.type=type;}
+	public Boolean getEqual(){return equal;}
+	public void setEqual(Boolean equal){this.equal=equal;}
 }

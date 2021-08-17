@@ -149,7 +149,7 @@ public class TransferService {
 		if(wallet.getBalance() < amount) return false;
 		wallet.setBalance(wallet.getBalance() - amount);
 		Present pr = new Present(rq.getPresentId(),rq.getUserId(),rq.getAmount(),rq.getAmount(),System.currentTimeMillis(),
-				rq.getSessionId(), false, rq.getEnvelope(), rq.getType());
+				rq.getSessionId(), false, rq.getEnvelope(), rq.getEqual());
 		presentRepository.save(pr);
 		return true;
 	}
@@ -162,10 +162,10 @@ public class TransferService {
 		if(pr==null) return -1L;
 		if(pr.getExpired()) return 0L;
 		if(pr.getEnvelope()==0) return -2L;
-		Boolean type = pr.getType();
+		Boolean equal = pr.getEqual();
 		Long am = pr.getTotalAmount()/pr.getEnvelope();
 
-		if (!type){
+		if (!equal){
 			Random rd = new Random();
 			am = am - 100;
 			am = 100 + rd.nextLong() % am*2;

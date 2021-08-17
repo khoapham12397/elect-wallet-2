@@ -35,14 +35,14 @@ public class Present {
 	@Column(name="envelope")
 	private Long envelope;
 
-	@Column(name="type")
-	private Boolean type;
+	@Column(name="equal")
+	private Boolean equal;
 
 	@Column(name="current_envelope")
 	private Long currentEnvelope;
 
 	public Present(String presentId, String ownerId, Long totalAmount, Long currentAmount, Long startTime,
-			String sessionId, Boolean expired, Long envelope, Boolean type) {
+			String sessionId, Boolean expired, Long envelope, Boolean equal) {
 		super();
 		this.presentId = presentId;
 		this.ownerId = ownerId;
@@ -52,7 +52,7 @@ public class Present {
 		this.sessionId = sessionId;
 		this.expired = expired;
 		this.envelope = envelope;
-		this.type = type;
+		this.equal = equal;
 		this.currentEnvelope = envelope;
 	}
 
@@ -110,8 +110,8 @@ public class Present {
 	public Long getEnvelope(){return envelope;}
 	public void setEnvelope(Long envelope){this.envelope=envelope;}
 
-	public Boolean getType(){return type;}
-	public void setType(Boolean type){this.type=type;}
+	public Boolean getEqual(){return equal;}
+	public void setEqual(Boolean equal){this.equal=equal;}
 
 	public Long getCurrentEnvelope(){return currentEnvelope;}
 	public void setCurrentEnvelope(Long currentEnvelope){this.currentEnvelope=currentEnvelope;}
