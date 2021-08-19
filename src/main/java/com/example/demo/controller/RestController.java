@@ -181,7 +181,6 @@ public class RestController {
 	
 	@PostMapping(value="/getPresent", produces= {MediaType.APPLICATION_JSON_VALUE})
 	public GetPresentResponse getPresent(@RequestBody GetPresentRequest rq){
-		
 		GetPresentResponse res = new GetPresentResponse();
 		Long amount = transferService.getPresent(rq);
 		if(amount>0) {
