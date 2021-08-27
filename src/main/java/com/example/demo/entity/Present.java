@@ -11,7 +11,7 @@ import javax.persistence.Table;
 public class Present {
 	
 	@Id
-	@Column(name="present_id")
+	@Column(name="trans_id")
 	private String presentId;
 	
 	@Column(name="owner_id")

@@ -5,12 +5,8 @@ public class RegisterUserRequest {
 	
 	private String username;
 	private String fullname;
-	// co gi do khong on ??
-	// dung vay d/
-	
 	private String password; 
 	private String userId;
-	
 	
 	
 	public String getUsername() {
@@ -19,21 +15,21 @@ public class RegisterUserRequest {
 	public void setUsername(String userName) {
 		this.username = userName;
 	}
+
 	public String getFullname() {
 		return fullname;
 	}
 	public void setFullname(String fullName) {
 		this.fullname = fullName;
 	}
+
 	public String getPassword() {
 		return password;
 	}
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	
-	
-	
+
 	public String getUserId() {
 		return userId;
 	}

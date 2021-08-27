@@ -48,41 +48,38 @@ public class TransferService {
 	}
 	
 	@Transactional(propagation = Propagation.REQUIRED)
-	public Long topup(TopupRequest request) {
+	public String topup(TopupRequest request) {
 		String walletId = request.getWalletId(); 
 		Long amount  = request.getAmount();
 		
 		Wallet wallet = entityManager.find(Wallet.class, walletId, LockModeType.PESSIMISTIC_WRITE);
 		if(wallet ==null) {
 			//System.out.println("wallet  is  null");
-			return 0L;
+			return null;
 		}
 		
 		wallet.setBalance(wallet.getBalance()+ amount);
 
-		
 		TopupTransaction tsx =new TopupTransaction();
+		tsx.setId(GenerationUtil.generateId("trans"));
 		tsx.setAmount(amount);
 		tsx.setTimestamp(System.currentTimeMillis());
 		tsx.setUserId(walletId);
 		
 		entityManager.persist(tsx);
-		//entityManager.flush();
 		return tsx.getId();
 		
 	}
 	
 	@Transactional(propagation = Propagation.REQUIRED)
-	public Long topupDirect(TopupDirectRequest request) {
+	public String topupDirect(TopupDirectRequest request) {
 		String userId = request.getUserId(); 
 		String pin = request.getPin();
-		
 		Wallet wallet = entityManager.find(Wallet.class, userId, LockModeType.PESSIMISTIC_WRITE);
 		if(wallet ==null) {
-			System.out.println("wallet  is  null");
-			return -1L;
+			return "Wallet is not exist";
 		}
-		if(!pin.equals(wallet.getHashedPin())) return 0L;
+		if(!pin.equals(wallet.getHashedPin())) return "PIN is not correct";
 		
 		Long amount  = request.getAmount();
 		wallet.setBalance(wallet.getBalance()+ amount);
@@ -93,30 +90,26 @@ public class TransferService {
 		tsx.setUserId(userId);
 		entityManager.persist(tsx);
 		return tsx.getId();
-		
 	}
 	
 	
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public Long sendP2P(SendP2PRequest request) throws SQLException {
+	public String sendP2P(SendP2PRequest request) throws SQLException {
 		String receiverId = request.getReceiverId();
 		String senderId = request.getSenderId();
 		Wallet senderWallet = entityManager.find(Wallet.class, senderId, LockModeType.PESSIMISTIC_WRITE);
 		Wallet receiverWallet = entityManager.find(Wallet.class, receiverId, LockModeType.PESSIMISTIC_WRITE);
-		
-	
+
 		Long amountSender = senderWallet.getBalance();
 		Long amount = request.getAmount();
-		if(amountSender < amount) {
-			return 0L;
-		}
+		if(amountSender < amount) {return null;}
 		senderWallet.setBalance(amountSender-amount);
 		receiverWallet.setBalance(receiverWallet.getBalance()+ amount);
-		
 
 		Long timestamp =  System.currentTimeMillis();
 		
 		P2PTransaction tsx =new P2PTransaction();
+		tsx.setId(GenerationUtil.generateId("user"));
 		tsx.setAmount(amount);
 		tsx.setDescription(request.getMesssage());
 		tsx.setReceiverId(receiverId);
@@ -164,11 +157,10 @@ public class TransferService {
 		if(pr.getEnvelope()==0) return -2L;
 		Boolean equal = pr.getEqual();
 		Long am = pr.getTotalAmount()/pr.getEnvelope();
-
 		if (!equal){
 			Random rd = new Random();
 			am = am - 100;
-			am = 100 + rd.nextLong() % am*2;
+			am = 100 + rd.nextLong() % (am*2);
 			if (am > pr.getCurrentAmount())
 				am = pr.getCurrentAmount();
 		}
@@ -177,7 +169,7 @@ public class TransferService {
 		pr.setCurrentEnvelope(pr.getCurrentEnvelope()-1);
 		Wallet wallet = entityManager.find(Wallet.class,rq.getUserId(), LockModeType.PESSIMISTIC_WRITE);
 		wallet.setBalance(wallet.getBalance() + am);
-		PresentTransaction pt = new PresentTransaction(UUID.randomUUID().toString(), rq.getUserId(), rq.getPresentId(), am, System.currentTimeMillis());
+		PresentTransaction pt = new PresentTransaction(GenerationUtil.generateId("trans"), rq.getUserId(), rq.getPresentId(), am, System.currentTimeMillis());
 		presentTransactionRepository.save(pt);
 		return am;
 	}

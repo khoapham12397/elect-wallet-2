@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.websocket.SendResult;
 
+import io.lettuce.core.api.sync.RedisCommands;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -102,22 +103,18 @@ public class RestController {
 	
 	@PostMapping(value="/topupDirect", produces = {MediaType.APPLICATION_JSON_VALUE})
 	public TopupResponse topupDirect(@RequestBody TopupDirectRequest rq){
-		Long txId= transferService.topupDirect(rq);
+		String txId= transferService.topupDirect(rq);
 		
 		TopupResponse res = new TopupResponse();
 		res.setTimestamp(System.currentTimeMillis());
-		if(txId>0L) {
+		if(txId.substring(0,4).equals("trans")) {
 			res.setCode(true);
 			res.setMessage("Transaction Successful");
 			res.setTransactionId(txId);
 		}
-		if(txId==0L) {
+		else{
 			res.setCode(false);
-			res.setMessage("PIN is not correct");
-		}
-		if(txId==-1L) {
-			res.setCode(false);
-			res.setMessage("Wallet is not exist");
+			res.setMessage(txId);
 		}
 		return res;
 	}
@@ -126,9 +123,9 @@ public class RestController {
 	public TopupResponse topup(@RequestBody TopupRequest rq){
 		//System.out.println(rq.getWalletId()+" topup "+ rq.getAmount()+" , mess: "+ rq.getMessage());
 		Long amount = rq.getAmount();
-		Long txId= transferService.topup(rq);
+		String txId= transferService.topup(rq);
 		TopupResponse res = new TopupResponse();
-		if(txId == 0L) {
+		if(txId == null) {
 			res.setCode(false);
 			res.setMessage("Your wallet is not exist");
 		}else {
@@ -144,21 +141,26 @@ public class RestController {
 	public SendP2PResponse sendP2P(@RequestBody SendP2PRequest rq){
 		System.out.println(rq.getSenderId()+ "send to "+ rq.getReceiverId()+" amount: "+ rq.getAmount());
 		
-		Long txId;
+		String txId;
 		SendP2PResponse res = new SendP2PResponse();
 		try {
 			txId = transferService.sendP2P(rq);
-			res.setCode(true);
-			res.setMessage("Transaction Successful");
-			res.setTimestamp(System.currentTimeMillis());
-			res.setTransactionId(txId);
-			res.setAmount(rq.getAmount());
+			if (txId!=null){
+				res.setCode(true);
+				res.setMessage("Transaction Successful");
+				res.setTimestamp(System.currentTimeMillis());
+				res.setTransactionId(txId);
+				res.setAmount(rq.getAmount());
+			}
+			else{
+				res.setMessage("Transaction failed");
+				res.setTimestamp(System.currentTimeMillis());
+			}
 		} catch (SQLException e) {
 			res.setMessage("Transaction failed");
 			res.setTimestamp(System.currentTimeMillis());
 			e.printStackTrace();
 		}
-	
 		return res;
 	}
 	
@@ -330,7 +332,7 @@ public class RestController {
 		System.out.println("Co nguoi vao day ");
 		Map<String,Object> res = new HashMap<>();
 		Student st= new Student();
-		st.setId(GenerationUtil.generateId());
+		st.setId(GenerationUtil.generateId("user_"));
 		st.setMajor("CS");
 		st.setEmail("khoapm2@vng.com");
 		st.setName("Pham Minh Khoa");

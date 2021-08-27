@@ -90,7 +90,9 @@ public class UserService {
 		wallet.setHashedPin(rq.getHashedPin());
 		walletRepository.save(wallet);
 	}
-	
+
+	public void addPartition(int year, int month, int day){
+	}
 	
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void registerUser(RegisterUserRequest rq) {
@@ -107,7 +109,6 @@ public class UserService {
 		authen.setUserId(rq.getUserId());
 		authen.setUsername(rq.getUsername());
 		authen.setHashedPassword(BCrypt.hashpw(rq.getPassword(), BCrypt.gensalt()));
-		
 		userRepository.save(profile);
 		authenRepository.save(authen);
 		

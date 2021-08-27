@@ -10,7 +10,7 @@ import javax.persistence.Table;
 public class Wallet {
 	
 	@Id
-	@Column(name="wallet_id")
+	@Column(name="user_id")
 	private String walletId;
 	
 	public Wallet(String walletId, Long balance) {

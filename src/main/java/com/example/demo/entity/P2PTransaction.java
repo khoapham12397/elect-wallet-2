@@ -12,9 +12,9 @@ import javax.persistence.Table;
 @Table(name="sendp2p_transaction")	
 public class P2PTransaction {
 	@Id
-	@Column(name="id")
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	@Column(name="trans_id")
+	private String id;
+
 	@Column(name="sender_id")
 	private String senderId;
 	
@@ -31,11 +31,11 @@ public class P2PTransaction {
 	@Column(name="description")
 	private String description;
 
-	public Long getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
@@ -79,8 +79,4 @@ public class P2PTransaction {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	// dieu nay co ve la kho chiu do nhan ??
-	// dun vay :
-	// tu do co the nao ??
-	
 }

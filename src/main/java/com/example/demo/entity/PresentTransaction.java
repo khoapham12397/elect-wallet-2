@@ -10,7 +10,7 @@ import javax.persistence.Table;
 public class PresentTransaction {
 	
 	@Id
-	@Column(name="id")
+	@Column(name="trans_id")
 	private String id;
 	
 	@Column(name="receiver_wallet_id")
