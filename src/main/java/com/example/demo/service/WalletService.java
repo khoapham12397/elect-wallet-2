@@ -29,12 +29,11 @@ import com.example.demo.repository.PresentRepository;
 import com.example.demo.util.GenerationUtil;
 
 @Service
-public class TransferService {
+public class WalletService {
 	
 	@PersistenceContext
 	EntityManager entityManager;
-	
-	
+
 	@Autowired
 	PresentRepository presentRepository;
 
@@ -192,17 +191,14 @@ public class TransferService {
 			Wallet wallet = entityManager.find(Wallet.class, userId,LockModeType.PESSIMISTIC_WRITE);
 			wallet.setBalance(wallet.getBalance() + pr.getCurrentAmount());
 		}
-		
 		presentRepository.delete(pr);
 	}
 	
 	public void getTopupTransactions(GetTopupsRequest rq) {
 		
 	}
-	
-	
+
 	public void getP2PTransactions(GetP2PsRequest rq) {
-		
 		String sql="select ts.id, ts.amount,ts.timestamp, s.username, r.username from P2PTransaction ts join Authenticate a";
 		entityManager.createQuery("");
 	}

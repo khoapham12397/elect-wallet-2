@@ -1,12 +1,9 @@
 package com.example.demo.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
-@Table(name="present_transaction")
+@Table(name="present_transaction", indexes = @Index(name = "receive_present_index", columnList = "trans_id", unique = true))
 public class PresentTransaction {
 	
 	@Id

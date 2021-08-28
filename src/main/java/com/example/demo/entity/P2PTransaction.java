@@ -1,15 +1,9 @@
 package com.example.demo.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
-@Table(name="transfer_transaction")
+@Table(name="transfer_transaction", indexes = @Index(columnList = "trans_id", unique = true, name = "transfer_index"))
 public class P2PTransaction {
 	@Id
 	@Column(name="trans_id")
@@ -34,7 +28,6 @@ public class P2PTransaction {
 	public String getId() {
 		return id;
 	}
-
 	public void setId(String id) {
 		this.id = id;
 	}
@@ -42,7 +35,6 @@ public class P2PTransaction {
 	public String getSenderId() {
 		return senderId;
 	}
-
 	public void setSenderId(String senderId) {
 		this.senderId = senderId;
 	}
@@ -50,7 +42,6 @@ public class P2PTransaction {
 	public String getReceiverId() {
 		return receiverId;
 	}
-
 	public void setReceiverId(String receiverId) {
 		this.receiverId = receiverId;
 	}
@@ -58,7 +49,6 @@ public class P2PTransaction {
 	public Long getTimestamp() {
 		return timestamp;
 	}
-
 	public void setTimestamp(Long timestamp) {
 		this.timestamp = timestamp;
 	}
@@ -66,7 +56,6 @@ public class P2PTransaction {
 	public Long getAmount() {
 		return amount;
 	}
-
 	public void setAmount(Long amount) {
 		this.amount = amount;
 	}
@@ -75,7 +64,6 @@ public class P2PTransaction {
 	public String getDescription() {
 		return description;
 	}
-
 	public void setDescription(String description) {
 		this.description = description;
 	}

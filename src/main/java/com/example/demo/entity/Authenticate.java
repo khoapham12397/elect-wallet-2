@@ -1,22 +1,22 @@
 package com.example.demo.entity;
 
+import com.sun.istack.NotNull;
 import org.springframework.context.annotation.Primary;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
-@Table(name="authenticate")
+@Table(name="authenticate", indexes = @Index(columnList = "user_id", unique = true, name = "authenticate_index"))
 public class Authenticate {
 	@Id
 	@Column(name="user_id")
 	private String userId;
-	
+
+	@NotNull
 	@Column(name="username")
 	private String username;
 
+	@NotNull
 	@Column(name="hashed_password")
 	private String hashedPassword;
 

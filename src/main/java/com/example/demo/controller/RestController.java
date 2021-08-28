@@ -5,9 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.websocket.SendResult;
-
-import io.lettuce.core.api.sync.RedisCommands;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -23,7 +20,6 @@ import com.example.demo.model.ActionResponse;
 import com.example.demo.model.ChangePassResponse;
 import com.example.demo.model.ChangePasswordRequest;
 import com.example.demo.model.ChangePinRequest;
-import com.example.demo.model.ChangeProfileRequest;
 import com.example.demo.model.CreatePresentResponse;
 import com.example.demo.model.GetBalanceRequest;
 import com.example.demo.model.GetBalanceResponse;
@@ -34,7 +30,6 @@ import com.example.demo.model.GetTopupsRequest;
 import com.example.demo.model.RegisterUserRequest;
 import com.example.demo.model.RegisterWalletRequest;
 import com.example.demo.model.RemovePresentRequest;
-import com.example.demo.model.ReturnPresent;
 import com.example.demo.model.SendP2PRequest;
 import com.example.demo.model.SendP2PResponse;
 import com.example.demo.model.SendPresentRequest;
@@ -47,12 +42,11 @@ import com.example.demo.repository.StudentRepository;
 import com.example.demo.repository.TopupRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.ExampleService;
-import com.example.demo.service.TransferService;
+import com.example.demo.service.WalletService;
 import com.example.demo.service.UserService;
 import com.example.demo.util.GenerationUtil;
 
 import io.lettuce.core.api.StatefulRedisConnection;
-import io.lettuce.core.api.async.RedisAsyncCommands;
 import io.lettuce.core.api.sync.RedisHashCommands;
 
 @org.springframework.web.bind.annotation.RestController
@@ -69,7 +63,7 @@ public class RestController {
 	UserService userService;
 
 	@Autowired
-	TransferService transferService;
+    WalletService walletService;
 	
 	@Autowired
 	TopupRepository topupRepository;
@@ -103,7 +97,7 @@ public class RestController {
 	
 	@PostMapping(value="/topupDirect", produces = {MediaType.APPLICATION_JSON_VALUE})
 	public TopupResponse topupDirect(@RequestBody TopupDirectRequest rq){
-		String txId= transferService.topupDirect(rq);
+		String txId= walletService.topupDirect(rq);
 		
 		TopupResponse res = new TopupResponse();
 		res.setTimestamp(System.currentTimeMillis());
@@ -123,7 +117,7 @@ public class RestController {
 	public TopupResponse topup(@RequestBody TopupRequest rq){
 		//System.out.println(rq.getWalletId()+" topup "+ rq.getAmount()+" , mess: "+ rq.getMessage());
 		Long amount = rq.getAmount();
-		String txId= transferService.topup(rq);
+		String txId= walletService.topup(rq);
 		TopupResponse res = new TopupResponse();
 		if(txId == null) {
 			res.setCode(false);
@@ -144,7 +138,7 @@ public class RestController {
 		String txId;
 		SendP2PResponse res = new SendP2PResponse();
 		try {
-			txId = transferService.sendP2P(rq);
+			txId = walletService.sendP2P(rq);
 			if (txId!=null){
 				res.setCode(true);
 				res.setMessage("Transaction Successful");
@@ -169,7 +163,7 @@ public class RestController {
 	@PostMapping(value="/createPresent", produces= {MediaType.APPLICATION_JSON_VALUE})
 	public CreatePresentResponse createPresent(@RequestBody SendPresentRequest rq){
 		CreatePresentResponse act =new CreatePresentResponse();
-	 	if(transferService.createPresent(rq)) {
+	 	if(walletService.createPresent(rq)) {
 	 		act.setCode(true);
 			act.setMessage("Successful");
 	 	}else {
@@ -184,7 +178,7 @@ public class RestController {
 	@PostMapping(value="/getPresent", produces= {MediaType.APPLICATION_JSON_VALUE})
 	public GetPresentResponse getPresent(@RequestBody GetPresentRequest rq){
 		GetPresentResponse res = new GetPresentResponse();
-		Long amount = transferService.getPresent(rq);
+		Long amount = walletService.getPresent(rq);
 		if(amount>0) {
 			res.setCode(true);
 			res.setMessage("Transaction successful");
@@ -214,7 +208,7 @@ public class RestController {
 	public ActionResponse returnPresent(@RequestBody RemovePresentRequest rq){
 		
 		ActionResponse res = new ActionResponse();
-		transferService.removePresent(rq.getPresentId());
+		walletService.removePresent(rq.getPresentId());
 		res.setCode(true);
 		res.setMessage("Transaction Sucsessful");
 		return res;

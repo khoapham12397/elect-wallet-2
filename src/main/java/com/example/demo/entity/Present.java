@@ -1,13 +1,9 @@
 package com.example.demo.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
-@Table(name="present")
+@Table(name="present", indexes = @Index(name = "present_index",columnList = "trans_id", unique = true))
 public class Present {
 	
 	@Id

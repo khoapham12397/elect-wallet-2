@@ -1,18 +1,20 @@
 package com.example.demo.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
-@Table(name="wallet")
+@Table(name="wallet", indexes = @Index(name = "wallet_index", columnList = "user_id", unique = true))
 public class Wallet {
-	
 	@Id
 	@Column(name="user_id")
 	private String walletId;
-	
+
+	@Column(name="balance")
+	private Long balance;
+
+	@Column(name="hashed_pin")
+	private String hashedPin;
+
 	public Wallet(String walletId, Long balance) {
 		super();
 		this.walletId = walletId;
@@ -24,7 +26,6 @@ public class Wallet {
 	public String getWalletId() {
 		return walletId;
 	}
-
 	public void setWalletId(String walletId) {
 		this.walletId = walletId;
 	}
@@ -32,26 +33,14 @@ public class Wallet {
 	public Long getBalance() {
 		return balance;
 	}
-
 	public void setBalance(Long balance) {
 		this.balance = balance;
 	}
 
-	
-
-	@Column(name="balance")
-	private Long balance;
-	
 	public String getHashedPin() {
 		return hashedPin;
 	}
-
 	public void setHashedPin(String hashedPin) {
 		this.hashedPin = hashedPin;
 	}
-
-
-
-	@Column(name="hashed_pin")
-	private String hashedPin;
 }

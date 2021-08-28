@@ -2,15 +2,11 @@ package com.example.demo.entity;
 
 import java.sql.Date;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
-@Table(name="user")
+@Table(name="user", indexes = @Index(name="user_index", columnList = "user_id", unique = true))
 public class UserProfile {
-	
 	@Id
 	@Column(name="user_id")
 	private String userId;

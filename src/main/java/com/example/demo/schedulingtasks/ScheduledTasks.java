@@ -2,15 +2,12 @@ package com.example.demo.schedulingtasks;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.time.YearMonth;
 import java.util.List;
 
-import com.example.demo.service.TransferService;
+import com.example.demo.service.WalletService;
 import io.lettuce.core.api.StatefulRedisConnection;
 import io.lettuce.core.api.sync.RedisCommands;
 import org.slf4j.Logger;
@@ -29,12 +26,12 @@ public class ScheduledTasks {
     private StatefulRedisConnection redisConnection;
 
     @Autowired
-    TransferService transferService;
+    WalletService walletService;
 
     @Scheduled(fixedRate = 300000)
     public void checkExpiredPresent() {
         log.info("Check Expired Present at {}", dateFormat.format(new Date()));
-        transferService.checkExprired();
+        walletService.checkExprired();
     }
 
     @Scheduled(cron = "0 55 23 * * *", zone="Asia/Ho_Chi_Minh")
