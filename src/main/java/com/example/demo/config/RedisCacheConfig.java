@@ -1,6 +1,7 @@
 package com.example.demo.config;
 
 import io.lettuce.core.RedisURI;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -9,13 +10,20 @@ import io.lettuce.core.api.StatefulRedisConnection;
 
 @Configuration
 public class RedisCacheConfig {
-	
+	@Value("${spring.redis.host}")
+	private String hostName;
+	@Value("${spring.redis.port}")
+	private Integer port;
+	@Value("${spring.redis.password}")
+	private String password;
+
 	@Bean(name="redisClient")
 	public RedisClient client() {
 		RedisURI.Builder sentinelRedisUriBuilder = RedisURI.builder();
-		sentinelRedisUriBuilder.withHost("redis-14748.c1.asia-northeast1-1.gce.cloud.redislabs.com").withPort(14748).withPassword("4AKuNXWB8BAQ93fTY2ryZLJeUTcimp9P".toCharArray());
+		sentinelRedisUriBuilder.withHost(hostName).withPort(port).withPassword(password);
 		return RedisClient.create(sentinelRedisUriBuilder.build());
 	};
+
 	@Bean(name="redisConnection")
 	public StatefulRedisConnection connection() {
 		return client().connect();
