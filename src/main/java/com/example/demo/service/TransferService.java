@@ -109,7 +109,7 @@ public class TransferService {
 		Long timestamp =  System.currentTimeMillis();
 		
 		P2PTransaction tsx =new P2PTransaction();
-		tsx.setId(GenerationUtil.generateId("user"));
+		tsx.setId(GenerationUtil.generateId("trans"));
 		tsx.setAmount(amount);
 		tsx.setDescription(request.getMesssage());
 		tsx.setReceiverId(receiverId);
@@ -160,7 +160,7 @@ public class TransferService {
 		if (!equal){
 			Random rd = new Random();
 			am = am - 100;
-			am = 100 + rd.nextLong() % (am*2);
+			am = 100 + rd.nextLong() & Long.MAX_VALUE % (am*2);
 			if (am > pr.getCurrentAmount())
 				am = pr.getCurrentAmount();
 		}

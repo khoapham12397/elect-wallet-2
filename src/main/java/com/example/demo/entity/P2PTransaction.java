@@ -9,7 +9,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="sendp2p_transaction")	
+@Table(name="transfer_transaction")
 public class P2PTransaction {
 	@Id
 	@Column(name="trans_id")
