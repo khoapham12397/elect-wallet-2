@@ -262,60 +262,12 @@ public class RestController {
 		return res;
 	}
 
-	@PostMapping(value="/getTopupsOfUser", produces= {MediaType.APPLICATION_JSON_VALUE})
-	public Map<String,Object> getTopupsOfUser(@RequestBody GetTopupsRequest rq){
-		Map<String,Object> res = new HashMap<>();
-		List<TopupTransaction> lst=null;
-		if(rq.getStart() != null) 
-			lst = topupRepository.findByUserAndTime(rq.getUserId(), rq.getStart(), rq.getEnd());
-		else 
-			lst = topupRepository.findAllByUserId(rq.getUserId());
-			
-		res.put("data", lst);
-		return res;
-	}
 	
-	@PostMapping(value="/getP2PsOfUser", produces= {MediaType.APPLICATION_JSON_VALUE})
-	public Map<String,Object> getP2PsOfSender(@RequestBody GetP2PsRequest rq){
-		String userId = rq.getUserId(); 
-		Long start = rq.getStart();
-		Long end= rq.getEnd();
-		System.out.println("Find: start = "+ rq.getStart()+" , end="+rq.getEnd()+" type="+rq.getType());
-		List<P2PTransaction> lst = null;
-		switch(rq.getType()) {
-		case 0:
-			if(rq.getStart()!=null) lst= p2pRepository.findBySenderAndTime(rq.getUserId(), 
-					rq.getStart(), rq.getEnd());
-			else lst= p2pRepository.findBySenderId(rq.getUserId());
-			break;
-		case 1:
-			if(rq.getStart()!=null) lst =  p2pRepository.findByReceiverAndTime(rq.getUserId(), 
-					rq.getStart(), rq.getEnd());
-			else lst= p2pRepository.findBySenderId(rq.getUserId());
-			break;
-		case 2:
-			
-			if(rq.getStart()!=null) {
-				
-				List<P2PTransaction> ls1= p2pRepository.findBySenderAndTime(userId, start, end);
-				List<P2PTransaction> ls2= p2pRepository.findBySenderAndTime(userId, start, end);
-				ls1.addAll(ls2);
-				lst = ls1;
-				
-			}else {
-				List<P2PTransaction> l1 =p2pRepository.findByReceiverId(userId);
-				List<P2PTransaction> l2 =p2pRepository.findBySenderId(userId);
-				l1.addAll(l2);
-				lst = l1;
-			}
-			break;
-		}
-		Map<String,Object> res= new HashMap<>();
-		res.put("data", lst);
-		return res;
-	}
+	
+	
 	@Autowired
 	StudentRepository studentRepo;
+	
 	
 	@Autowired
 	ExampleService exService;
@@ -333,5 +285,21 @@ public class RestController {
 		exService.add(st);
 		res.put("id",st.getId());
 		return res;
+	}
+	
+	@PostMapping(value="/getTopupsOfUser",produces= {MediaType.APPLICATION_JSON_VALUE} )
+	public Map<String,Object> getTopupTransactions(@RequestBody GetTopupsRequest rq){
+		List<TopupTransaction> lst = walletService.getTopupTransactions(rq);
+		Map<String,Object> obj =new HashMap<String,Object>();
+		obj.put("data",lst);
+		return obj;
+	}
+	
+	@PostMapping(value="/getP2PsOfUser",produces= {MediaType.APPLICATION_JSON_VALUE} )
+	public Map<String,Object> getP2PTransactions(@RequestBody GetP2PsRequest rq){
+		List<P2PTransaction> lst = walletService.getP2PTransactions(rq);
+		Map<String,Object> obj =new HashMap<String,Object>();
+		obj.put("data",lst);
+		return obj;
 	}
 }

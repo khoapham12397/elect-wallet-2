@@ -21,7 +21,15 @@ public final class GenerationUtil {
 	public static String generateId() {
 		return UUID.randomUUID().toString();
 	}
+	// lam sao ma no dua vo duoc ?
+	@Autowired
+	private RedisTemplate<String, Integer> redisTemplateAutowired;
+	
 	private static RedisTemplate<String, Integer> redisTemplate;
+	
+	@PostConstruct
+	private void init() {redisTemplate = this.redisTemplateAutowired;}	
+	
 	public static String generateId(String s){
 		//RedisCommands<String, String> com = redis.sync();
 		String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyMMdd"));

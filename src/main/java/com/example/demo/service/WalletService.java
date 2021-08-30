@@ -1,17 +1,18 @@
 package com.example.demo.service;
 
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
-import java.util.UUID;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 
 import com.example.demo.entity.*;
 import com.example.demo.repository.PresentTransactionRepository;
-import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -20,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.demo.model.GetP2PsRequest;
 import com.example.demo.model.GetPresentRequest;
 import com.example.demo.model.GetTopupsRequest;
-import com.example.demo.model.ReturnPresent;
 import com.example.demo.model.SendP2PRequest;
 import com.example.demo.model.SendPresentRequest;
 import com.example.demo.model.TopupDirectRequest;
@@ -101,7 +101,9 @@ public class WalletService {
 
 		Long amountSender = senderWallet.getBalance();
 		Long amount = request.getAmount();
+		
 		if(amountSender < amount) {return null;}
+		
 		senderWallet.setBalance(amountSender-amount);
 		receiverWallet.setBalance(receiverWallet.getBalance()+ amount);
 
@@ -172,12 +174,18 @@ public class WalletService {
 		presentTransactionRepository.save(pt);
 		return am;
 	}
-
+	
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void checkExprired() {
 		List<Present> presents = presentRepository.findExpiredPresent(System.currentTimeMillis()-24*60*60*1000);
 		for (Present present:presents){
 			present.setExpired(true);
+			if(present.getCurrentAmount() > 0L) {
+				String id = present.getOwnerId();
+				Wallet wallet = entityManager.find(Wallet.class, id, LockModeType.PESSIMISTIC_WRITE);
+				wallet.setBalance(wallet.getBalance() + present.getCurrentAmount());
+				present.setCurrentAmount(0L);
+			}
 			System.out.println("Expired present: " + present.getPresentId());
 		}
 	}
@@ -194,12 +202,51 @@ public class WalletService {
 		presentRepository.delete(pr);
 	}
 	
-	public void getTopupTransactions(GetTopupsRequest rq) {
-		
-	}
 
-	public void getP2PTransactions(GetP2PsRequest rq) {
-		String sql="select ts.id, ts.amount,ts.timestamp, s.username, r.username from P2PTransaction ts join Authenticate a";
-		entityManager.createQuery("");
+	public List<P2PTransaction> getP2PTransactions(GetP2PsRequest rq) {
+		String userId = rq.getUserId();
+		int type = rq.getType();
+	
+		SimpleDateFormat formater = new SimpleDateFormat("yyMMdd");
+		
+		String startDate = formater.format(new Date(rq.getStart())); 
+		String endDate = formater.format(new Date(rq.getEnd() + 24L*3600L*1000L));
+		
+		String sql = "select ts from P2PTransaction ts where ts.id >=:startDate and ts.id<=:endDate ";
+		
+		switch(type) {
+			case 0:
+				sql+= "and senderId =:userId";
+				break;
+			case 1:
+				sql+= "and receiverId =:userId";
+				break;
+			case 2:
+				sql+= "and senderId =:userId or receiverId=:userId";
+				break;
+		}
+		
+		TypedQuery<P2PTransaction> query = entityManager.createQuery(sql, P2PTransaction.class);
+		
+		query.setParameter("startDate", startDate);
+		query.setParameter("endDate", endDate);
+		query.setParameter("userId", userId);
+		return query.getResultList();
+	}
+	
+	public List<TopupTransaction> getTopupTransactions(GetTopupsRequest rq){
+		String userId = rq.getUserId();
+		
+		SimpleDateFormat formater = new SimpleDateFormat("yyMMdd");
+		String startDate = formater.format(new Date(rq.getStart())); 
+		String endDate = formater.format(new Date(rq.getEnd() + 24L*3600L*1000L));
+		
+		String sql = "select ts from TopupTransaction ts where ts.id>=:startDate and ts.id <=:endDate and userId =:id";
+		TypedQuery<TopupTransaction> query= entityManager.createQuery(sql,TopupTransaction.class);
+		
+		query.setParameter("startDate", startDate);
+		query.setParameter("endDate", endDate);
+		query.setParameter("id", userId);
+		return query.getResultList();
 	}
 }

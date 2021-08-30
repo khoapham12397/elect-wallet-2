@@ -10,6 +10,7 @@ import io.lettuce.core.api.StatefulRedisConnection;
 
 @Configuration
 public class RedisCacheConfig {
+	
 	@Value("${spring.redis.host}")
 	private String hostName;
 	@Value("${spring.redis.port}")
@@ -20,7 +21,7 @@ public class RedisCacheConfig {
 	@Bean(name="redisClient")
 	public RedisClient client() {
 		RedisURI.Builder sentinelRedisUriBuilder = RedisURI.builder();
-		sentinelRedisUriBuilder.withHost(hostName).withPort(port).withPassword(password);
+		sentinelRedisUriBuilder.withHost("localhost");
 		return RedisClient.create(sentinelRedisUriBuilder.build());
 	};
 

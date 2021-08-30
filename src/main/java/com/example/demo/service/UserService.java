@@ -105,6 +105,7 @@ public class UserService {
 		profile.setFullName(rq.getFullname());
 		profile.setUserId(rq.getUserId());
 		
+		
 		Authenticate authen = new Authenticate();
 		authen.setUserId(rq.getUserId());
 		authen.setUsername(rq.getUsername());
